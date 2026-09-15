@@ -1,28 +1,52 @@
-export default async function handler(req, res) {
+const https = require('https');
+const url = require('url');
+
+module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', '*');
-  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const path = req.query.path;
-  const target = 'https://dashscope.aliyuncs.com/' + path;
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  const parsed = url.parse(req.url, true);
+  const targetPath = parsed.query.path || '';
+  const targetUrl = 'https://dashscope.aliyuncs.com/' + targetPath;
+
+  let body = '';
+  for await (const chunk of req) {
+    body += chunk;
+  }
 
   const headers = {};
-  if (req.headers.authorization) headers['Authorization'] = req.headers.authorization;
-  if (req.headers['content-type']) headers['Content-Type'] = req.headers['content-type'];
-
-  const fetchOptions = { method: req.method, headers: headers };
-  if (req.method === 'POST') {
-    fetchOptions.body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+  if (req.headers.authorization) {
+    headers['Authorization'] = req.headers.authorization;
+  }
+  if (req.headers['content-type']) {
+    headers['Content-Type'] = req.headers['content-type'];
+  }
+  if (body) {
+    headers['Content-Length'] = Buffer.byteLength(body);
   }
 
-  try {
-    const resp = await fetch(target, fetchOptions);
-    const data = await resp.arrayBuffer();
-    res.setHeader('Content-Type', resp.headers.get('content-type') || 'application/json');
-    res.status(resp.status);
-    res.send(Buffer.from(data));
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+  const options = {
+    method: req.method,
+    headers: headers,
+  };
+
+  const proxyReq = https.request(targetUrl, options, (proxyRes) => {
+    res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'application/json');
+    res.status(proxyRes.statusCode);
+    proxyRes.pipe(res);
+  });
+
+  proxyReq.on('error', (e) => {
+    res.status(502).json({ error: e.message });
+  });
+
+  if (body) {
+    proxyReq.write(body);
   }
-}
+  proxyReq.end();
+};
