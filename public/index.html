@@ -19,7 +19,7 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
 .bi{width:32px;height:32px;border-radius:8px;border:1px solid var(--b);background:var(--s2);color:var(--m);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .w{max-width:480px;margin:0 auto;padding:12px;display:flex;flex-direction:column;gap:12px}
 .c{background:var(--s);border:1px solid var(--b);border-radius:var(--R);padding:16px;opacity:0;animation:fu .4s ease forwards}
-.c:nth-child(2){animation-delay:.04s}.c:nth-child(3){animation-delay:.08s}.c:nth-child(4){animation-delay:.12s}.c:nth-child(5){animation-delay:.16s}.c:nth-child(6){animation-delay:.2s}
+.c:nth-child(2){animation-delay:.04s}.c:nth-child(3){animation-delay:.08s}.c:nth-child(4){animation-delay:.12s}.c:nth-child(5){animation-delay:.16s}
 @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .cl{font-size:10px;font-weight:500;color:var(--m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
 .stp{border-color:var(--a);border-style:dashed}
@@ -100,7 +100,6 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
   <div class="r"><div class="dt" id="dt"></div><button class="bi" onclick="tS()">⚙</button></div>
 </nav>
 
-<!-- Settings Modal -->
 <div class="mo" id="sBg" onclick="if(event.target===this)tS()">
   <div class="md" style="text-align:left">
     <h3>设置</h3>
@@ -124,10 +123,7 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
   </div>
 </div>
 
-<!-- Main Content -->
 <div class="w">
-
-  <!-- Setup -->
   <div class="c stp" id="sC">
     <div class="cl">设置 API Key</div>
     <input type="password" id="sK" placeholder="粘贴阿里云 API Key (sk-xxx)">
@@ -135,14 +131,12 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
     <button class="bs" onclick="fS()">保存并开始</button>
   </div>
 
-  <!-- Mic -->
   <div class="c mw">
     <div class="mb" id="mB" onclick="tR()">🎤</div>
     <div class="ml" id="mL">点击开始同传</div>
     <div class="ms" id="mS"></div>
   </div>
 
-  <!-- Language -->
   <div class="c">
     <div class="cl">目标语言</div>
     <div class="gs">
@@ -158,7 +152,6 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
     </div>
   </div>
 
-  <!-- Voice -->
   <div class="c">
     <div class="cl">音色</div>
     <div class="vr"><b id="vD"></b><span id="vT">默认声音</span></div>
@@ -168,7 +161,6 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
     </div>
   </div>
 
-  <!-- Stats -->
   <div class="c">
     <div class="ss">
       <div class="s"><div class="sv" id="sC2">0</div><div class="sl2">已翻译</div></div>
@@ -177,16 +169,13 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
     </div>
   </div>
 
-  <!-- Results -->
   <div class="c">
     <div class="cl">翻译记录</div>
     <div class="rs" id="rs"><div class="ep">点击麦克风开始</div></div>
   </div>
-
   <div style="height:20px"></div>
 </div>
 
-<!-- Clone Modal -->
 <div class="mo" id="cBg">
   <div class="md">
     <h3>克隆声音</h3>
@@ -204,454 +193,61 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
 <div class="to" id="to"></div>
 
 <script>
-// ========== State ==========
+var API='https://dashscope.aliyuncs.com';
 var ak=localStorage.getItem('ak')||'';
 var tm=localStorage.getItem('tm')||'browser';
 var eo=localStorage.getItem('eo')!=='0';
 var vi=localStorage.getItem('vi')||'';
 var lg=localStorage.getItem('lg')||'pt';
-var rn=false;
-var cn=0;
-
-// Audio
+var rn=false,cn=0;
 var ac,pr,as,chnks=[],sp=false,sn=0;
-
-// Clone
 var rR,rC=[],rB2=null,rM=null,rS2=0,rc=false;
-
-// Lang maps
 var LN={pt:'葡萄牙语',en:'英语',es:'西班牙语',fr:'法语',de:'德语',ja:'日语',ko:'韩语',ar:'阿拉伯语',ru:'俄语'};
 var LT={pt:'PT',en:'EN',es:'ES',fr:'FR',de:'DE',ja:'JA',ko:'KO',ar:'AR',ru:'RU'};
 var BL={pt:'pt-BR',en:'en-US',es:'es-ES',fr:'fr-FR',de:'de-DE',ja:'ja-JP',ko:'ko-KR',ar:'ar-SA',ru:'ru-RU'};
 var EI={neutral:'',happy:'用愉快的语气',sad:'用低沉悲伤的语气',angry:'用严肃愤怒的语气',surprised:'用惊讶的语气',worried:'用担忧的语气',excited:'用激动兴奋的语气',gentle:'用温柔的语气'};
-
-// ========== Init ==========
-(function(){
-  if(ak) $('sC').classList.add('hd');
-  $('kI').value=ak;
-  $('eT').checked=eo;
-  refreshTTS();
-  document.querySelectorAll('.g').forEach(function(b){b.classList.toggle('on',b.dataset.l===lg)});
-  $('sL2').textContent=LT[lg];
-  if(vi){$('vD').classList.add('on');$('vT').textContent='已克隆'}
-})();
-
+(function(){if(ak)$('sC').classList.add('hd');$('kI').value=ak;$('eT').checked=eo;refreshTTS();document.querySelectorAll('.g').forEach(function(b){b.classList.toggle('on',b.dataset.l===lg)});$('sL2').textContent=LT[lg];if(vi){$('vD').classList.add('on');$('vT').textContent='已克隆'}})();
 function $(id){return document.getElementById(id)}
-
-// ========== Settings ==========
 function tS(){$('sBg').classList.toggle('show')}
+function sT(el){tm=el.dataset.m;localStorage.setItem('tm',tm);refreshTTS()}
+function refreshTTS(){document.querySelectorAll('.ti').forEach(function(t){t.classList.toggle('on',t.dataset.m===tm)})}
+function sS(){ak=$('kI').value.trim();eo=$('eT').checked;localStorage.setItem('ak',ak);localStorage.setItem('eo',eo?'1':'0');if(ak)$('sC').classList.add('hd');tS();toast('已保存')}
+function fS(){ak=$('sK').value.trim();if(!ak)return toast('请输入Key');localStorage.setItem('ak',ak);$('sC').classList.add('hd');$('kI').value=ak;toast('保存成功')}
+function sL(el){document.querySelectorAll('.g').forEach(function(b){b.classList.remove('on')});el.classList.add('on');lg=el.dataset.l;localStorage.setItem('lg',lg);$('sL2').textContent=LT[lg];toast(LN[lg])}
 
-function sT(el){
-  tm=el.dataset.m;
-  localStorage.setItem('tm',tm);
-  refreshTTS();
-}
+async function tR(){if(!ak)return toast('请先填写API Key');if(!rn){try{as=await navigator.mediaDevices.getUserMedia({audio:true});sCp(as);rn=true;$('mB').classList.add('on');$('mL').classList.add('on');$('mL').textContent='点击停止';$('dt').classList.add('on');$('mS').textContent='监听中...';toast('已开启')}catch(e){toast('麦克风失败')}}else{eCp();rn=false;$('mB').classList.remove('on');$('mL').classList.remove('on');$('mL').textContent='点击开始同传';$('dt').classList.remove('on');$('mS').textContent='';toast('已停止')}}
 
-function refreshTTS(){
-  document.querySelectorAll('.ti').forEach(function(t){
-    t.classList.toggle('on',t.dataset.m===tm);
-  });
-}
+function sCp(stream){ac=new(window.AudioContext||window.webkitAudioContext)({sampleRate:16000});var source=ac.createMediaStreamSource(stream);pr=ac.createScriptProcessor(2048,1,1);chnks=[];sp=false;sn=0;pr.onaudioprocess=function(e){var d=e.inputBuffer.getChannelData(0);var rms=Math.sqrt(d.reduce(function(s,v){return s+v*v},0)/d.length);if(rms>0.012){chnks.push(new Float32Array(d));sp=true;sn=0;if(rn)$('mS').textContent='🔴 录音中'}else if(sp){chnks.push(new Float32Array(d));sn++;if(sn>=10){var total=chnks.reduce(function(s,c){return s+c.length},0);var merged=new Float32Array(total);var off=0;chnks.forEach(function(c){merged.set(c,off);off+=c.length});chnks=[];sp=false;sn=0;if(rn)$('mS').textContent='处理中...';pSg(merged)}}};source.connect(pr);pr.connect(ac.destination)}
+function eCp(){if(pr){pr.disconnect();pr=null}if(ac){ac.close();ac=null}if(as){as.getTracks().forEach(function(t){t.stop()});as=null}}
 
-function sS(){
-  ak=$('kI').value.trim();
-  eo=$('eT').checked;
-  localStorage.setItem('ak',ak);
-  localStorage.setItem('eo',eo?'1':'0');
-  if(ak) $('sC').classList.add('hd');
-  tS();
-  toast('已保存');
-}
+async function pSg(samples){var t0=Date.now();try{var wav=eW(samples,16000);var blob=new Blob([wav],{type:'audio/wav'});var original=await callASR(blob);if(!original||original.length<2){if(rn)$('mS').textContent='监听中...';return}var translated,emotion='neutral';if(eo){var r=await callTranslateEmo(original);translated=r.t;emotion=r.e||'neutral'}else{translated=await callTranslate(original)}if(!translated){if(rn)$('mS').textContent='监听中...';return}await speak(translated,emotion);var delay=((Date.now()-t0)/1000).toFixed(1);cn++;$('sC2').textContent=cn;$('sD').textContent=delay;addResult(original,translated,emotion,delay);if(rn)$('mS').textContent='监听中...'}catch(e){console.error(e);toast('出错: '+e.message);if(rn)$('mS').textContent='监听中...'}}
 
-function fS(){
-  ak=$('sK').value.trim();
-  if(!ak) return toast('请输入Key');
-  localStorage.setItem('ak',ak);
-  $('sC').classList.add('hd');
-  $('kI').value=ak;
-  toast('保存成功');
-}
+function apiHeaders(){return{'Authorization':'Bearer '+ak}}
 
-// ========== Language ==========
-function sL(el){
-  document.querySelectorAll('.g').forEach(function(b){b.classList.remove('on')});
-  el.classList.add('on');
-  lg=el.dataset.l;
-  localStorage.setItem('lg',lg);
-  $('sL2').textContent=LT[lg];
-  toast(LN[lg]);
-}
+async function callASR(blob){var fd=new FormData();fd.append('file',blob,'audio.wav');fd.append('model','paraformer-v2');var r=await fetch(API+'/compatible-mode/v1/audio/transcriptions',{method:'POST',headers:apiHeaders(),body:fd});var d=await r.json();if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));return(d.text||'').trim()}
 
-// ========== Start/Stop ==========
-async function tR(){
-  if(!ak) return toast('请先填写API Key');
-  if(!rn){
-    try{
-      as=await navigator.mediaDevices.getUserMedia({audio:true});
-      sCp(as);
-      rn=true;
-      $('mB').classList.add('on');
-      $('mL').classList.add('on');
-      $('mL').textContent='点击停止';
-      $('dt').classList.add('on');
-      $('mS').textContent='监听中...';
-      toast('已开启');
-    }catch(e){toast('麦克风失败')}
-  }else{
-    eCp();
-    rn=false;
-    $('mB').classList.remove('on');
-    $('mL').classList.remove('on');
-    $('mL').textContent='点击开始同传';
-    $('dt').classList.remove('on');
-    $('mS').textContent='';
-    toast('已停止');
-  }
-}
+async function callTranslate(text){var r=await fetch(API+'/compatible-mode/v1/chat/completions',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},apiHeaders()),body:JSON.stringify({model:'qwen-turbo',messages:[{role:'system',content:'翻译成'+LN[lg]+'。只输出翻译，口语化'},{role:'user',content:text}],temperature:0.3,max_tokens:500})});var d=await r.json();if(d.error)throw new Error(d.error.message);return d.choices[0].message.content.trim()}
 
-// ========== Audio Capture ==========
-function sCp(stream){
-  ac=new(window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
-  var source=ac.createMediaStreamSource(stream);
-  pr=ac.createScriptProcessor(2048,1,1);
-  chnks=[];sp=false;sn=0;
+async function callTranslateEmo(text){var r=await fetch(API+'/compatible-mode/v1/chat/completions',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},apiHeaders()),body:JSON.stringify({model:'qwen-turbo',messages:[{role:'system',content:'翻译成'+LN[lg]+'。判断情绪。只输出JSON:{"t":"译文","e":"代码"} 代码选：neutral/happy/sad/angry/surprised/worried/excited/gentle'},{role:'user',content:text}],temperature:0.3,max_tokens:500})});var d=await r.json();if(d.error)throw new Error(d.error.message);try{var p=JSON.parse(d.choices[0].message.content.trim());return{t:p.t,e:p.e||'neutral'}}catch(e){return{t:d.choices[0].message.content.trim(),e:'neutral'}}}
 
-  pr.onaudioprocess=function(e){
-    var d=e.inputBuffer.getChannelData(0);
-    var rms=Math.sqrt(d.reduce(function(s,v){return s+v*v},0)/d.length);
+async function speak(text,emotion){if(tm==='dashscope'){await speakDash(text,emotion)}else{await speakBrowser(text)}}
 
-    if(rms>0.012){
-      chnks.push(new Float32Array(d));
-      sp=true;
-      sn=0;
-      if(rn) $('mS').textContent='🔴 录音中';
-    }else if(sp){
-      chnks.push(new Float32Array(d));
-      sn++;
-      if(sn>=10){
-        var total=chnks.reduce(function(s,c){return s+c.length},0);
-        var merged=new Float32Array(total);
-        var off=0;
-        chnks.forEach(function(c){merged.set(c,off);off+=c.length});
-        chnks=[];sp=false;sn=0;
-        if(rn) $('mS').textContent='处理中...';
-        pSg(merged);
-      }
-    }
-  };
-  source.connect(pr);
-  pr.connect(ac.destination);
-}
+async function speakBrowser(text){if(!('speechSynthesis' in window))return;speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang=BL[lg]||'en-US';u.rate=1.1;await new Promise(function(res){u.onend=res;u.onerror=res;setTimeout(res,10000);speechSynthesis.speak(u)})}
 
-function eCp(){
-  if(pr){pr.disconnect();pr=null}
-  if(ac){ac.close();ac=null}
-  if(as){as.getTracks().forEach(function(t){t.stop()});as=null}
-}
+async function speakDash(text,emotion){var inst=EI[emotion]||'';var bd={model:'cosyvoice-v3-flash',voice:vi||'longxiaochun',input:text};if(inst)bd.instruction=inst;var r=await fetch(API+'/compatible-mode/v1/audio/speech',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},apiHeaders()),body:JSON.stringify(bd)});if(!r.ok)throw new Error('TTS失败');var bl=await r.blob();var url=URL.createObjectURL(bl);await new Promise(function(res){var a=new Audio(url);a.onended=function(){URL.revokeObjectURL(url);res()};a.onerror=res;setTimeout(res,12000);a.play().catch(res)})}
 
-// ========== Process Segment ==========
-async function pSg(samples){
-  var t0=Date.now();
-  try{
-    var wav=eW(samples,16000);
-    var blob=new Blob([wav],{type:'audio/wav'});
+function eW(samples,sr){var len=samples.length*2;var buf=new ArrayBuffer(44+len);var v=new DataView(buf);function w(o,t){for(var i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))}w(0,'RIFF');v.setUint32(4,36+len,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,len,true);for(var i=0,o=44;i<samples.length;i++,o+=2){var n=Math.max(-1,Math.min(1,samples[i]));v.setInt16(o,n<0?n*0x8000:n*0x7FFF,true)}return buf}
 
-    // 1. ASR
-    var original=await callASR(blob);
-    if(!original||original.length<2){
-      if(rn) $('mS').textContent='监听中...';
-      return;
-    }
+function oC(){if(!ak)return toast('先填Key');$('cBg').classList.add('show');rB2=null;$('rT').textContent='0:00';$('rH').textContent='点击开始';$('rB').classList.remove('on');$('cB').disabled=true}
+function cC(){if(rc)sR2();$('cBg').classList.remove('show');if(rM){clearInterval(rM);rM=null}}
+async function tRec(){if(!rc){try{var stream=await navigator.mediaDevices.getUserMedia({audio:true});rR=new MediaRecorder(stream);rC=[];rR.ondataavailable=function(e){rC.push(e.data)};rR.onstop=function(){rB2=new Blob(rC,{type:'audio/webm'});stream.getTracks().forEach(function(t){t.stop()});$('cB').disabled=false;$('rH').textContent='录音完成'};rR.start();rc=true;rS2=Date.now();$('rB').classList.add('on');$('rH').textContent='录音中...';rM=setInterval(function(){var sec=Math.floor((Date.now()-rS2)/1000);$('rT').textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');if(sec>=30)sR2()},200)}catch(e){toast('麦克风失败')}}else sR2()}
+function sR2(){if(rR&&rR.state!=='inactive')rR.stop();rc=false;if(rM){clearInterval(rM);rM=null}$('rB').classList.remove('on')}
+async function sC3(){if(!rB2)return;var btn=$('cB');btn.disabled=true;btn.textContent='克隆中...';try{var fd=new FormData();fd.append('audio',rB2,'voice.webm');var uploadR=await fetch('https://file.io',{method:'POST',body:fd});var uploadD=await uploadR.json();var audioUrl=uploadD.link||uploadD.url;if(!audioUrl)throw new Error('上传失败');var r=await fetch(API+'/api/v1/services/audio/tts/customization',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},apiHeaders()),body:JSON.stringify({model:'voice-enrollment',input:{action:'create_voice',target_model:'cosyvoice-v3.5-flash',prefix:'my',url:audioUrl}})});var d=await r.json();if(d.output&&d.output.voice_id){vi=d.output.voice_id;localStorage.setItem('vi',vi);$('vD').classList.add('on');$('vT').textContent='已克隆';toast('克隆成功!');cC()}else throw new Error(JSON.stringify(d))}catch(e){toast('失败: '+e.message)}btn.disabled=false;btn.textContent='提交'}
+function rV(){vi='';localStorage.removeItem('vi');$('vD').classList.remove('on');$('vT').textContent='默认声音';toast('已恢复默认')}
 
-    // 2. Translate
-    var translated,emotion='neutral';
-    if(eo){
-      var r=await callTranslateEmo(original);
-      translated=r.t;
-      emotion=r.e||'neutral';
-    }else{
-      translated=await callTranslate(original);
-    }
-
-    if(!translated){
-      if(rn) $('mS').textContent='监听中...';
-      return;
-    }
-
-    // 3. TTS
-    await speak(translated,emotion);
-
-    // 4. UI
-    var delay=((Date.now()-t0)/1000).toFixed(1);
-    cn++;
-    $('sC2').textContent=cn;
-    $('sD').textContent=delay;
-    addResult(original,translated,emotion,delay);
-    if(rn) $('mS').textContent='监听中...';
-
-  }catch(e){
-    console.error(e);
-    toast('出错: '+e.message);
-    if(rn) $('mS').textContent='监听中...';
-  }
-}
-
-// ========== API Calls ==========
-async function callASR(blob){
-  var fd=new FormData();
-  fd.append('file',blob,'audio.wav');
-  fd.append('model','paraformer-v2');
-  var r=await fetch('/compatible-mode/v1/audio/transcriptions',{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+ak},
-    body:fd
-  });
-  var d=await r.json();
-  if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
-  return (d.text||'').trim();
-}
-
-async function callTranslate(text){
-  var r=await fetch('/compatible-mode/v1/chat/completions',{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+ak,'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'qwen-turbo',
-      messages:[
-        {role:'system',content:'翻译成'+LN[lg]+'。只输出翻译，口语化'},
-        {role:'user',content:text}
-      ],
-      temperature:0.3,
-      max_tokens:500
-    })
-  });
-  var d=await r.json();
-  if(d.error) throw new Error(d.error.message);
-  return d.choices[0].message.content.trim();
-}
-
-async function callTranslateEmo(text){
-  var r=await fetch('/compatible-mode/v1/chat/completions',{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+ak,'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'qwen-turbo',
-      messages:[
-        {role:'system',content:'翻译成'+LN[lg]+'。判断情绪。只输出JSON:{"t":"译文","e":"代码"} 代码选：neutral/happy/sad/angry/surprised/worried/excited/gentle'},
-        {role:'user',content:text}
-      ],
-      temperature:0.3,
-      max_tokens:500
-    })
-  });
-  var d=await r.json();
-  if(d.error) throw new Error(d.error.message);
-  try{
-    var p=JSON.parse(d.choices[0].message.content.trim());
-    return {t:p.t,e:p.e||'neutral'};
-  }catch(e){
-    return {t:d.choices[0].message.content.trim(),e:'neutral'};
-  }
-}
-
-// ========== TTS ==========
-async function speak(text,emotion){
-  if(tm==='dashscope'){
-    await speakDashScope(text,emotion);
-  }else{
-    await speakBrowser(text);
-  }
-}
-
-async function speakBrowser(text){
-  if(!('speechSynthesis' in window)) return;
-  speechSynthesis.cancel();
-  var u=new SpeechSynthesisUtterance(text);
-  u.lang=BL[lg]||'en-US';
-  u.rate=1.1;
-  await new Promise(function(res){
-    u.onend=res;u.onerror=res;
-    setTimeout(res,10000);
-    speechSynthesis.speak(u);
-  });
-}
-
-async function speakDashScope(text,emotion){
-  var inst=EI[emotion]||'';
-  var bd={model:'cosyvoice-v3-flash',voice:vi||'longxiaochun',input:text};
-  if(inst) bd.instruction=inst;
-  var r=await fetch('/compatible-mode/v1/audio/speech',{
-    method:'POST',
-    headers:{'Authorization':'Bearer '+ak,'Content-Type':'application/json'},
-    body:JSON.stringify(bd)
-  });
-  if(!r.ok) throw new Error('TTS失败');
-  var blob=await r.blob();
-  var url=URL.createObjectURL(blob);
-  await new Promise(function(res){
-    var a=new Audio(url);
-    a.onended=function(){URL.revokeObjectURL(url);res()};
-    a.onerror=res;
-    setTimeout(res,12000);
-    a.play().catch(res);
-  });
-}
-
-// ========== WAV Encoder ==========
-function eW(samples,sr){
-  var len=samples.length*2;
-  var buf=new ArrayBuffer(44+len);
-  var v=new DataView(buf);
-  function w(o,t){for(var i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))}
-  w(0,'RIFF');v.setUint32(4,36+len,true);w(8,'WAVE');
-  w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);
-  v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);
-  v.setUint16(32,2,true);v.setUint16(34,16,true);
-  w(36,'data');v.setUint32(40,len,true);
-  for(var i=0,o=44;i<samples.length;i++,o+=2){
-    var n=Math.max(-1,Math.min(1,samples[i]));
-    v.setInt16(o,n<0?n*0x8000:n*0x7FFF,true);
-  }
-  return buf;
-}
-
-// ========== Voice Clone ==========
-function oC(){
-  if(!ak) return toast('先填Key');
-  $('cBg').classList.add('show');
-  rB2=null;
-  $('rT').textContent='0:00';
-  $('rH').textContent='点击开始';
-  $('rB').classList.remove('on');
-  $('cB').disabled=true;
-}
-
-function cC(){
-  if(rc) sR2();
-  $('cBg').classList.remove('show');
-  if(rM){clearInterval(rM);rM=null}
-}
-
-async function tRec(){
-  if(!rc){
-    try{
-      var stream=await navigator.mediaDevices.getUserMedia({audio:true});
-      rR=new MediaRecorder(stream);
-      rC=[];
-      rR.ondataavailable=function(e){rC.push(e.data)};
-      rR.onstop=function(){
-        rB2=new Blob(rC,{type:'audio/webm'});
-        stream.getTracks().forEach(function(t){t.stop()});
-        $('cB').disabled=false;
-        $('rH').textContent='录音完成';
-      };
-      rR.start();
-      rc=true;
-      rS2=Date.now();
-      $('rB').classList.add('on');
-      $('rH').textContent='录音中...';
-      rM=setInterval(function(){
-        var sec=Math.floor((Date.now()-rS2)/1000);
-        $('rT').textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
-        if(sec>=30) sR2();
-      },200);
-    }catch(e){toast('麦克风失败')}
-  }else{
-    sR2();
-  }
-}
-
-function sR2(){
-  if(rR&&rR.state!=='inactive') rR.stop();
-  rc=false;
-  if(rM){clearInterval(rM);rM=null}
-  $('rB').classList.remove('on');
-}
-
-async function sC3(){
-  if(!rB2) return;
-  var btn=$('cB');
-  btn.disabled=true;
-  btn.textContent='克隆中...';
-  try{
-    var fd=new FormData();
-    fd.append('audio',rB2,'voice.webm');
-    var uploadR=await fetch('https://file.io',{method:'POST',body:fd});
-    var uploadD=await uploadR.json();
-    var audioUrl=uploadD.link||uploadD.url;
-    if(!audioUrl) throw new Error('上传失败');
-
-    var r=await fetch('/api/v1/services/audio/tts/customization',{
-      method:'POST',
-      headers:{'Authorization':'Bearer '+ak,'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'voice-enrollment',
-        input:{
-          action:'create_voice',
-          target_model:'cosyvoice-v3.5-flash',
-          prefix:'my',
-          url:audioUrl
-        }
-      })
-    });
-    var d=await r.json();
-    if(d.output&&d.output.voice_id){
-      vi=d.output.voice_id;
-      localStorage.setItem('vi',vi);
-      $('vD').classList.add('on');
-      $('vT').textContent='已克隆';
-      toast('克隆成功!');
-      cC();
-    }else{
-      throw new Error(JSON.stringify(d));
-    }
-  }catch(e){
-    toast('失败: '+e.message);
-  }
-  btn.disabled=false;
-  btn.textContent='提交';
-}
-
-function rV(){
-  vi='';
-  localStorage.removeItem('vi');
-  $('vD').classList.remove('on');
-  $('vT').textContent='默认声音';
-  toast('已恢复默认');
-}
-
-// ========== Results UI ==========
-function addResult(orig,trans,emo,delay){
-  var area=$('rs');
-  var empty=area.querySelector('.ep');
-  if(empty) empty.remove();
-
-  var el=document.createElement('div');
-  el.className='it';
-  el.innerHTML=
-    '<div class="io">'+esc(orig)+'</div>'+
-    '<div class="ie">'+esc(trans)+'</div>'+
-    '<div class="im">'+
-      '<span class="eb e-'+emo+'">'+emo+'</span>'+
-      '<span>'+delay+'s</span>'+
-      '<span>'+new Date().toLocaleTimeString()+'</span>'+
-    '</div>';
-  area.insertBefore(el,area.firstChild);
-  while(area.children.length>50) area.removeChild(area.lastChild);
-}
-
-function esc(t){
-  var d=document.createElement('div');
-  d.textContent=t;
-  return d.innerHTML;
-}
-
-function toast(msg){
-  var t=$('to');
-  t.textContent=msg;
-  t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show')},2500);
-}
+function addResult(orig,trans,emo,delay){var area=$('rs');var empty=area.querySelector('.ep');if(empty)empty.remove();var el=document.createElement('div');el.className='it';el.innerHTML='<div class="io">'+esc(orig)+'</div><div class="ie">'+esc(trans)+'</div><div class="im"><span class="eb e-'+emo+'">'+emo+'</span><span>'+delay+'s</span><span>'+new Date().toLocaleTimeString()+'</span></div>';area.insertBefore(el,area.firstChild);while(area.children.length>50)area.removeChild(area.lastChild)}
+function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
+function toast(msg){var t=$('to');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2500)}
 </script>
 </body>
 </html>
