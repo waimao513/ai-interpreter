@@ -108,7 +108,7 @@ body{font-family:'Noto Sans SC',-apple-system,sans-serif;background:var(--bg);co
 <div class="mo" id="cBg"><div class="md"><h3>克隆声音</h3><p>对着麦克风说 10~20 秒</p><div class="rt" id="rT">0:00</div><div class="rb" id="rB" onclick="tRec()">🔴</div><div class="rh" id="rH">点击开始</div><div class="br" style="margin-top:12px"><button class="bt" onclick="cC()">取消</button><button class="bt p" id="cB" onclick="sC3()" disabled>提交</button></div></div></div>
 <div class="to" id="to"></div>
 <script>
-var P='/.netlify/functions/proxy';
+var P='https://ai-proxy.mrdm7222117.workers.dev';
 var ak=localStorage.getItem('ak')||'',tm=localStorage.getItem('tm')||'browser',eo=localStorage.getItem('eo')!=='0',vi=localStorage.getItem('vi')||'',lg=localStorage.getItem('lg')||'pt',rn=false,cn=0,ac,pr,as,chnks=[],sp=false,sn=0,rR,rC=[],rB2=null,rM=null,rS2=0,rc=false;
 var LN={pt:'葡萄牙语',en:'英语',es:'西班牙语',fr:'法语',de:'德语',ja:'日语',ko:'韩语',ar:'阿拉伯语',ru:'俄语'},LT={pt:'PT',en:'EN',es:'ES',fr:'FR',de:'DE',ja:'JA',ko:'KO',ar:'AR',ru:'RU'},BL={pt:'pt-BR',en:'en-US',es:'es-ES',fr:'fr-FR',de:'de-DE',ja:'ja-JP',ko:'ko-KR',ar:'ar-SA',ru:'ru-RU'},EI={neutral:'',happy:'用愉快的语气',sad:'用低沉悲伤的语气',angry:'用严肃愤怒的语气',surprised:'用惊讶的语气',worried:'用担忧的语气',excited:'用激动兴奋的语气',gentle:'用温柔的语气'};
 (function(){if(ak)$('sC').classList.add('hd');$('kI').value=ak;$('eT').checked=eo;document.querySelectorAll('.ti').forEach(function(t){t.classList.toggle('on',t.dataset.m===tm)});document.querySelectorAll('.g').forEach(function(b){b.classList.toggle('on',b.dataset.l===lg)});$('sL2').textContent=LT[lg];if(vi){$('vD').classList.add('on');$('vT').textContent='已克隆'}})();
